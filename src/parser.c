@@ -50,7 +50,7 @@ void TaskInput(void)
 
   /* Do we have to print the prompt? */
   if(printPrompt) {
-    printf("ARMON>");
+    printf("STMEmSy>");
     printPrompt = 0;
   }
 
