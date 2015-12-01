@@ -49,3 +49,32 @@ void CmdAdcRead(int mode)
 }
 
 ADD_CMD("adcread", CmdAdcRead, "adcread <ch[1-4]> Command to read ADC after adcinit command");
+
+/*commands for stepper motor*/
+void CmdStepper(int mode)
+{
+	uint32_t cmdArg1, cmdArg2;
+
+	if(mode != CMD_INTERACTIVE) return;
+	
+	/* check for valid arguments*/
+	if(fetch_int32_arg((int32_t*)&cmdArg1) < 0)
+	{
+		printf("Step count missing\n");
+		return;
+	}
+	
+	if(fetch_uint32_arg((uint32_t*)&cmdArg2) < 0)
+	{
+		printf("step delay missing\n");
+		return;
+	}
+
+	/*activate stepper*/
+	if(activateStepper(cmdArg1, cmdArg2) != STEPPER_OK)
+		printf("Stepper error\n");
+	else
+		printf("Stepper Success!!\n");
+}
+
+ADD_CMD("stepper", CmdStepper, "<steps [0-reset position]> <delay> Command to activate stepper motor");

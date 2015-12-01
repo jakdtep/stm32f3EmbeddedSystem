@@ -5,5 +5,6 @@ on the board*/
 #define STM_EMSYS_LIB_H
 
 #include "stm_emsys_analog.h"
+#include "stm_emsys_stepper.h"
 
 #endif
