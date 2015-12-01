@@ -12,6 +12,7 @@ SRCS = main.c
 SRCS += monitor.c parser.c dump.c syscall.c terminal.c \
 	decoder/decoder.c decoder/STM32F30x_decoder.c
 
+SRCS += stmEmSys/stm_emsys.c
 
 ###################################################
 # Location of the linker scripts

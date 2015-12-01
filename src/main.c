@@ -6,6 +6,7 @@
 #include "stm32f3_discovery_gyroscope.h"
 
 #include "common.h"
+#include "stmEmSys/stm_emsys.h"
 
 /* Private variables ---------------------------------------------------------*/
 const Led_TypeDef LEDs[] = {LED3, LED4, LED5, LED6, LED7, LED8, LED9, LED10};
@@ -52,6 +53,9 @@ int main(int argc, char **argv)
   while(1) {
     TaskInput();
     /* Tickle the watchdog */
+    
+    /*embedded system external peripheral service*/
+    emSysTaskService();
   }
 
   return 0;
@@ -120,6 +124,9 @@ void Error_Handler(void)
 void SysTick_Handler(void)
 {
     HAL_IncTick();
+    
+    /*embedded system peripheral timer service*/
+    emSysTimerService();
 }
 
 void CmdLED(int mode)
