@@ -15,6 +15,9 @@ const uint32_t numLEDs = sizeof(LEDs)/sizeof(LEDs[0]);
 /* Private function prototypes -----------------------------------------------*/
 static void SystemClock_Config(void);
 
+/*global varible to record timer ticks*/
+uint32_t myTickCount = 0;
+
 int main(int argc, char **argv)
 {
   uint32_t i;
@@ -124,6 +127,7 @@ void Error_Handler(void)
 void SysTick_Handler(void)
 {
     HAL_IncTick();
+    myTickCount++;
     
     /*embedded system peripheral timer service*/
     emSysTimerService();

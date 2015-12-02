@@ -5,8 +5,16 @@
 
 #include "stm_emsys_stepper.h"
 
+/*link the varibale to timer interrupt*/
+extern uint32_t myTickCount;
 /*status to track initialization*/
 static int8_t stepperInitDone = 0;
+
+/*status variables for stepper 1*/
+static uint32_t stepper1Step, stepper1Steps, stepper1Start;
+static uint32_t stepper1Delay, stepper1Timer;
+static uint8_t *pStepper1StepSeq = NULL;
+static uint8_t stepper1 = NULL;
 
 /*gpio pins used Stepper poles are in ACBD order*/
 static uint32_t gpiosPC[4] = {GPIO_PIN_6, GPIO_PIN_8, 
@@ -37,25 +45,7 @@ static uint8_t stepsHalf[2][4] = {{1, 3, 2, 6, 4, 12, 8, 9},
 #endif
 
 /*to track current step of the motor*/
-static uint32_t curStep = 0;
-/*init timer block*/
-void initTIM1(uint32_t prescale)
-{
-	__TIM1_CLK_ENABLE();
-	TIM1->PSC = prescale;
-	TIM1->CR1 = 0x1;
-}
-
-/*poll and wait till timer expired*/
-void pollWaitMsTIM1(uint16_t delayMs)
-{
-	uint32_t counter = (delayMs*40);
-	TIM1->CNT = 0;
-//	printf("counter is at %d, %d\n", (unsigned) TIM1->CNT, (unsigned)counter);
-	while(TIM1->CNT < counter)
-		asm volatile("nop\n");
-}
-
+static uint32_t curStep1 = 0;
 
 int8_t initStepperGpioPortC(uint32_t *gpios)
 {
@@ -76,10 +66,6 @@ int8_t initStepperGpioPortC(uint32_t *gpios)
 
 int8_t activateStepper(int32_t steps, uint32_t delay)
 {
-	/*loop step times*/
-	uint32_t step, start = curStep;
-	uint8_t *pTempStepSeq = NULL;
-	
 	/*make sure stepper init is done once*/
 	if(!stepperInitDone)
 	{
@@ -92,47 +78,86 @@ int8_t activateStepper(int32_t steps, uint32_t delay)
 	if(steps < 0)
 	{
 		printf("sending reverse sequence\n");
-		pTempStepSeq = stepSeq[1];
+		pStepper1StepSeq = stepSeq[1];
 		/*get absolute of steps for looping*/
-		steps = -steps;
+		stepper1Step = -steps;
 	}else
 	{
 		printf("sending forward sequence\n");
-		pTempStepSeq = stepSeq[0];
+		pStepper1StepSeq = stepSeq[0];
 	}
-	for(step=start; step<(steps+start); step++)
-	{
-#ifdef STEPPER_FULL_STEP
-		curStep = step & 3;
-#else
-		curStep = step & 7;
-#endif
-		printf("writting step %d, val = %d\n", 
-				(unsigned)curStep, (unsigned)pTempStepSeq[curStep]);
-		/*test each bit and write to gpio*/
-		HAL_GPIO_WritePin(GPIOC, gpiosPC[0], 
-				pTempStepSeq[curStep]&1?1:0);
-		HAL_GPIO_WritePin(GPIOC, gpiosPC[1], 
-				pTempStepSeq[curStep]&2?1:0);
-		HAL_GPIO_WritePin(GPIOC, gpiosPC[2], 
-				pTempStepSeq[curStep]&4?1:0);
-		HAL_GPIO_WritePin(GPIOC, gpiosPC[3], 
-				pTempStepSeq[curStep]&8?1:0);
-		/*wait delay Milli seconds bw each step*/
-		pollWaitMsTIM1(delay);
-	}
-	/*reset all gpio to deactivate all coils*/
-	HAL_GPIO_WritePin(GPIOC, gpiosPC[0], 0);
-	HAL_GPIO_WritePin(GPIOC, gpiosPC[1], 0);
-	HAL_GPIO_WritePin(GPIOC, gpiosPC[2], 0);
-	HAL_GPIO_WritePin(GPIOC, gpiosPC[3], 0);
-		/*wait delay Milli seconds bw each step*/
+	stepper1Steps = steps;
+	/*start from previously stopped position*/
+	stepper1Start = stepper1Step = curStep1;
+	stepper1 = STEPPER_ON;
+	stepper1Delay = delay;
 	return  STEPPER_OK;
 }
 
+void stepperSendNextStep(uint8_t stepperNo)
+{
+	if(stepperNo == STEPPER1)
+	{
+		if(stepper1Step < (stepper1Steps + stepper1Start))
+		{
+#ifdef STEPPER_FULL_STEP
+			curStep1 = stepper1Step & 3;
+#else
+			curStep1 = stepper1Step & 7;
+#endif
+			//printf("writting step %d, val = %d\n", 
+		   //			(unsigned)curStep1, (unsigned)pStepper1StepSeq[curStep1]);
+			/*test each bit and write to gpio*/
+			HAL_GPIO_WritePin(GPIOC, gpiosPC[0], 
+					pStepper1StepSeq[curStep1]&1?1:0);
+			HAL_GPIO_WritePin(GPIOC, gpiosPC[1], 
+					pStepper1StepSeq[curStep1]&2?1:0);
+			HAL_GPIO_WritePin(GPIOC, gpiosPC[2], 
+					pStepper1StepSeq[curStep1]&4?1:0);
+			HAL_GPIO_WritePin(GPIOC, gpiosPC[3], 
+					pStepper1StepSeq[curStep1]&8?1:0);
+			stepper1Step++;
+		}
+		/*turn of stepper*/
+		else
+		{
+		    printf("Turning Stepper%d OFF\n", stepperNo);
+			stepper1 = STEPPER_OFF;
+			stepper1Timer = 0;
+			stepper1Delay = 0;
+			stepper1Steps = 0;
+			stepper1Step = 0;
+			/*reset all gpio to deactivate all coils*/
+			HAL_GPIO_WritePin(GPIOC, gpiosPC[0], 0);
+			HAL_GPIO_WritePin(GPIOC, gpiosPC[1], 0);
+			HAL_GPIO_WritePin(GPIOC, gpiosPC[2], 0);
+			HAL_GPIO_WritePin(GPIOC, gpiosPC[3], 0);
+			
+		}
+	}
+}
+
+
 int8_t initStepper()
 {
-	initTIM1(TIM1_100KHZ);
 	initStepperGpioPortC(gpiosPC);
 	return  STEPPER_OK;
 }
+
+/*API to trigger stepper from timer interrupt*/
+void triggerStepper()
+{
+	/*check if stepper1 is ON*/
+	if(stepper1 == STEPPER_ON)
+	{
+		if(!stepper1Timer)
+		{
+			stepper1Timer = myTickCount + stepper1Delay;
+		}else if(myTickCount >= stepper1Timer)
+		{
+			stepperSendNextStep(STEPPER1);
+			stepper1Timer = myTickCount + stepper1Delay;
+		}
+	}
+}
+

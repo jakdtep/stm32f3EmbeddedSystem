@@ -8,6 +8,7 @@ and interrupt handler*/
 /*timer interrupt service*/
 void emSysTimerService()
 {
+    triggerStepper();
 }
 
 /*main tasks service*/
@@ -47,8 +48,8 @@ void CmdAdcRead(int mode)
 	if(adcVal != ADC_ERR)
 		printf("Analog value at GPIO PA%d is %d\n", (int)tempCmdArgInt, adcVal);
 }
-
 ADD_CMD("adcread", CmdAdcRead, "adcread <ch[1-4]> Command to read ADC after adcinit command");
+
 
 /*commands for stepper motor*/
 void CmdStepper(int mode)
