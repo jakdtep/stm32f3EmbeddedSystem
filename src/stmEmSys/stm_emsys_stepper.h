@@ -22,6 +22,7 @@
 #define STEPPER_OFF 0
 
 #define STEPPER1    0
+#define STEPPER2    1
 
 /*timer 100Khz prescaler*/ 
 #define TIM1_100KHZ	1440
@@ -30,7 +31,7 @@
 int8_t initStepper();
 
 /*API to activate stepper*/
-int8_t activateStepper(int32_t steps, uint32_t delay);
+int8_t activateStepper(uint8_t stepperNo, int32_t steps, uint32_t delay);
 
 /*API to trigger stepper from timer interrupt*/
 void triggerStepper();

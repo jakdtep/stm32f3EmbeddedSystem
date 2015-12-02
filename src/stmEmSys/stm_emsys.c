@@ -54,9 +54,16 @@ ADD_CMD("adcread", CmdAdcRead, "adcread <ch[1-4]> Command to read ADC after adci
 /*commands for stepper motor*/
 void CmdStepper(int mode)
 {
-	uint32_t cmdArg1, cmdArg2;
+	uint32_t cmdArg1, cmdArg2, cmdArgNo;
 
 	if(mode != CMD_INTERACTIVE) return;
+	
+	/* check for valid arguments*/
+	if(fetch_int32_arg((int32_t*)&cmdArgNo) < 0)
+	{
+		printf("Stepper motor number missing\n");
+		return;
+	}
 	
 	/* check for valid arguments*/
 	if(fetch_int32_arg((int32_t*)&cmdArg1) < 0)
@@ -72,7 +79,7 @@ void CmdStepper(int mode)
 	}
 
 	/*activate stepper*/
-	if(activateStepper(cmdArg1, cmdArg2) != STEPPER_OK)
+	if(activateStepper(cmdArgNo, cmdArg1, cmdArg2) != STEPPER_OK)
 		printf("Stepper error\n");
 	else
 		printf("Stepper Success!!\n");
