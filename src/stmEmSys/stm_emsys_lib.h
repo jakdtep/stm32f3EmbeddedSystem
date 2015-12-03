@@ -6,5 +6,6 @@ on the board*/
 
 #include "stm_emsys_analog.h"
 #include "stm_emsys_stepper.h"
+#include "stm_emsys_lcd16x2.h"
 
 #endif

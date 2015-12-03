@@ -86,3 +86,26 @@ void CmdStepper(int mode)
 }
 
 ADD_CMD("stepper", CmdStepper, "<steps [0-reset position]> <delay> Command to activate stepper motor");
+
+void CmdLcdTest(int mode)
+{
+	char *tempCmdArgStr;
+	uint32_t pos = 0;
+	if(mode != CMD_INTERACTIVE) return;
+
+	fetch_string_arg((char**)&tempCmdArgStr);
+
+	fetch_uint32_arg((uint32_t*)&pos);
+	/*if(!lcdInitDone)
+	{
+		initLcd(LCD_DISP_ON_BLINK);
+		//lcdInitDone = 1; 
+	}*/
+	initLcd(LCD_DISP_ON);
+	printf("sending string %s at %d\n", tempCmdArgStr, (int)pos);
+	clearLcd();
+	gotoLcd(pos);
+	putsLcd(tempCmdArgStr);
+}
+
+ADD_CMD("lcdtest", CmdLcdTest, "		Command to test lcd");

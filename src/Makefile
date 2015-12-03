@@ -14,7 +14,8 @@ SRCS += monitor.c parser.c dump.c syscall.c terminal.c \
 
 SRCS += stmEmSys/stm_emsys.c \
         stmEmSys/stm_emsys_analog.c \
-        stmEmSys/stm_emsys_stepper.c 
+        stmEmSys/stm_emsys_stepper.c\
+        stmEmSys/stm_emsys_lcd16x2.c
 
 ###################################################
 # Location of the linker scripts
@@ -43,6 +44,8 @@ SRCS   += $(HAL_SRC)/stm32f3xx_hal_rcc.c \
 	  $(HAL_SRC)/stm32f3xx_hal_spi.c \
 	  $(HAL_SRC)/stm32f3xx_hal_adc.c \
 	  $(HAL_SRC)/stm32f3xx_hal_adc_ex.c \
+	$(HAL_SRC)/stm32f3xx_hal_tim.c	\
+	$(HAL_SRC)/stm32f3xx_hal_tim_ex.c
 
 # USB Sources
 USB_CORE     = Drivers/STM32_USB_Device_Library/Core
