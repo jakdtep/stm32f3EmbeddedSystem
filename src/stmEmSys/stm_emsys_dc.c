@@ -295,7 +295,7 @@ void startDcMotor( uint32_t cmdArg1, int32_t cmdArg2, uint16_t adc)
 		printf("Set speed Success!!\n");
 
 	adc = sampleDcMotorTacho(DCMOTOR_TACHO_CH);
-	printf("Tacho %d\n", (unsigned)adc);
+	//printf("Tacho %d\n", (unsigned)adc);
 
-	printf("calculated speed=%d\n", (int)((adc + DCMOTOR_ADC2SPEED_C) / DCMOTOR_ADC2SPEED_M));
+	//printf("calculated speed=%d\n", (int)((adc + DCMOTOR_ADC2SPEED_C) / DCMOTOR_ADC2SPEED_M));
 }
