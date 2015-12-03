@@ -19,6 +19,9 @@
 #define LCD_E		GPIO_PIN_7
 #define LCD_BL		GPIO_PIN_8
 
+#define LCD_PWM_PRESCALE    72
+#define LCD_PWM_PERIOD      1000
+
 #define LCD_DISP_OFF		0
 #define LCD_DISP_ON		    1
 #define LCD_DISP_ON_CURSOR	2
@@ -39,5 +42,7 @@ void gotoLcd(uint8_t pos);
 /*clears the LCD display*/
 void clearLcd();
 
+/*sets lcd backlight brightness*/
+void setLcdBlBrightness(uint16_t bright);
 
 #endif

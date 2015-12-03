@@ -103,6 +103,7 @@ void CmdLcdTest(int mode)
 	}*/
 	initLcd(LCD_DISP_ON);
 	printf("sending string %s at %d\n", tempCmdArgStr, (int)pos);
+	setLcdBlBrightness(500);
 	clearLcd();
 	gotoLcd(pos);
 	putsLcd(tempCmdArgStr);

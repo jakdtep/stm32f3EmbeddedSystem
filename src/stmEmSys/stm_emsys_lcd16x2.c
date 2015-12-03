@@ -43,6 +43,42 @@ int8_t initLcdGpioPD()
 	return LCD_OK;
 }
 
+/*initializes the gpio needed for LCD backlight on/off*/
+int8_t initLcdBlGpioPB()
+{
+	GPIO_InitTypeDef  GPIO_InitStruct;
+	/* Configure the GPIO pins for the backlight */
+	__GPIOB_CLK_ENABLE();
+	GPIO_InitStruct.Pin       = LCD_BL;
+	GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
+	GPIO_InitStruct.Pull      = GPIO_NOPULL;
+	GPIO_InitStruct.Speed     = GPIO_SPEED_HIGH;
+	GPIO_InitStruct.Alternate = 1;
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+	
+	/*turn the backlight on*/
+	//HAL_GPIO_WritePin(GPIOB, LCD_BL, 1);
+	return LCD_OK;
+}
+
+/*init pwm timer block*/
+void initPwmTIM16()
+{
+	__TIM16_CLK_ENABLE();
+	TIM16->PSC = LCD_PWM_PRESCALE;
+	TIM16->ARR = LCD_PWM_PERIOD; 
+	TIM16->CR1 |= (1<<7);
+	TIM16->CCMR1 = 0b01101000;
+	TIM16->EGR |= 0b11100010;
+	TIM16->BDTR |= (1<<15);
+	TIM16->CCER = 0x1;
+	TIM16->CR1 |= 1;
+}
+/*sets the lcd backlight brightness*/
+void setLcdBlBrightness(uint16_t bright)
+{
+    	TIM16->CCR1 = bright;
+}
 
 /*write the data before setting the 4bit mode*/
 uint8_t writeLcdInitCmd(uint8_t cmd8u)
@@ -192,6 +228,10 @@ void initLcd(uint8_t dispAttr)
 {
 	/*init lcd bus gpios*/
 	initLcdGpioPD();
+	/*init lcd backlight gpio*/
+	initLcdBlGpioPB();
+	/*init back light pwm module*/
+	initPwmTIM16();
 	/*send the init sequence*/
 	sendLcdInitSequence(dispAttr);
 }
