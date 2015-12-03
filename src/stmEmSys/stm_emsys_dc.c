@@ -214,7 +214,7 @@ int8_t setDirDcMotorPC(int32_t speed, uint32_t *gpios)
 int8_t setSpeedDcMotorPB(int32_t speed, uint32_t gpio)
 {
 
-	HAL_GPIO_WritePin(GPIOB, gpio, 1);
+	//HAL_GPIO_WritePin(GPIOB, gpio, 1);
 	speed = speed<0?-speed:speed;
 
 	speed = speed<DCMOTOR_MIN_SPEED?DCMOTOR_MIN_SPEED:speed;
@@ -226,7 +226,7 @@ int8_t setSpeedDcMotorPB(int32_t speed, uint32_t gpio)
 	dcMotorCurSpeed = speed;
 	dcMotorIsRunning = 1;
 
-	printf("DC motor set speed %d\n", (int)speed);
+//	printf("DC motor set speed %d\n", (int)speed);
 	return DCMOTOR_OK;
 }
 /*turn dc motor off  portB*/
@@ -234,7 +234,7 @@ int8_t stopDcMotorPB(uint32_t gpio)
 {
 	printf("DC motor stop\n");
 
-	TIM15->BDTR &= ~(1<<15);
+	//TIM15->BDTR &= ~(1<<15);
 	TIM15->CCR1 = 0;
 	TIM15->CR1 &= ~1;
 	dcMotorCurSpeed = 0;
@@ -255,7 +255,7 @@ void updateDcMotorSpeed()
 	tacho1 = sampleDcMotorTacho(0);
 	calcSpeed = (tacho1 + DCMOTOR_ADC2SPEED_C) / DCMOTOR_ADC2SPEED_M;
 	delta = dcMotorSetSpeed - calcSpeed;
-	printf("tacho=%d, calcSpeed=%d, curSpeed=%d, delta=%d\n", tacho1, calcSpeed, dcMotorCurSpeed, delta);
+//	printf("tacho=%d, calcSpeed=%d, curSpeed=%d, delta=%d\n", tacho1, calcSpeed, dcMotorCurSpeed, delta);
 	if(delta >= DCMOTOR_RESPOND_DELTA)
 		setSpeedDcMotorPB(dcMotorCurSpeed + DCMOTOR_SPEED_STEP, gpiosDcMotorPwmPB);
 	else if(delta < -DCMOTOR_RESPOND_DELTA)
@@ -295,7 +295,7 @@ void startDcMotor( uint32_t cmdArg1, int32_t cmdArg2, uint16_t adc)
 		printf("Set speed Success!!\n");
 
 	adc = sampleDcMotorTacho(DCMOTOR_TACHO_CH);
-	//printf("Tacho %d\n", (unsigned)adc);
+	printf("Tacho %d\n", (unsigned)adc);
 
 	//printf("calculated speed=%d\n", (int)((adc + DCMOTOR_ADC2SPEED_C) / DCMOTOR_ADC2SPEED_M));
 }
