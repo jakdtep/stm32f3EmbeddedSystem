@@ -31,6 +31,9 @@ void startDcMotor( uint32_t cmdArg1, int32_t cmdArg2, uint16_t adc);
 // API to stop DC Motor
 int8_t stopDcMotorPB(uint32_t gpio);
 
+// API to update dcmotor speed in closed loop to be called from timer interrupt
+void updateDcMotorSpeed();
+
 
 #endif
 

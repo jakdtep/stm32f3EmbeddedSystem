@@ -24,6 +24,7 @@ void initAllPeripherals()
 void emSysTimerService()
 {
 	triggerStepper();
+	updateDcMotorSpeed();
 #ifdef LCD_BL_PULSE_ON
 	pulsateLcdBl();
 #endif
