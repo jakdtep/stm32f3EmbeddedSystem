@@ -21,6 +21,11 @@
 
 #define LCD_PWM_PRESCALE    72
 #define LCD_PWM_PERIOD      1000
+#define LCD_BL_PULSE_ON     1
+
+#define LCD_BL_PULSE_RATE   100
+/*multiple of 8 for easy modulo*/
+#define LCD_BL_PULSE_STEPS  8
 
 #define LCD_DISP_OFF		0
 #define LCD_DISP_ON		    1
@@ -45,4 +50,6 @@ void clearLcd();
 /*sets lcd backlight brightness*/
 void setLcdBlBrightness(uint16_t bright);
 
+/*pulsate lcd backlight (called from timer interrupt)*/
+void pulsateLcdBl();
 #endif

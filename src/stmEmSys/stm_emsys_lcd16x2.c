@@ -11,6 +11,11 @@ uint32_t lcdDataGpios[4] = {GPIO_PIN_8, GPIO_PIN_9, GPIO_PIN_10, GPIO_PIN_11};
 /*status to track lcd init*/
 //static int8_t lcdInitDone = 0;
 
+/*lcd backlight pulse table*/
+static uint16_t lcdPulseTb[LCD_BL_PULSE_STEPS] = {250, 400, 550, 750, 900, 750, 550, 400};
+static uint32_t lcdPulseStep = 0; 
+static uint32_t lcdPulseDelay = 0; 
+
 /*poll and wait till timer expired*/
 void pollWaitMs(uint16_t delayMs)
 {
@@ -234,4 +239,21 @@ void initLcd(uint8_t dispAttr)
 	initPwmTIM16();
 	/*send the init sequence*/
 	sendLcdInitSequence(dispAttr);
+}
+
+
+/*pulsate lcd backlight (called from timer interrupt)*/
+void pulsateLcdBl()
+{
+	if(!lcdPulseDelay)
+	{
+		lcdPulseDelay = myTickCount + LCD_BL_PULSE_RATE;
+		lcdPulseStep = 0;
+	}else if(myTickCount > lcdPulseDelay)
+	{
+		setLcdBlBrightness(lcdPulseTb[lcdPulseStep++ & (LCD_BL_PULSE_STEPS-1)]);
+		lcdPulseDelay = myTickCount + LCD_BL_PULSE_RATE;
+		//printf("%d\n", (int)lcdPulseStep & (LCD_BL_PULSE_STEPS-1));
+	}
+
 }

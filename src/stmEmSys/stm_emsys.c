@@ -9,6 +9,9 @@ and interrupt handler*/
 void emSysTimerService()
 {
     triggerStepper();
+#ifdef LCD_BL_PULSE_ON
+    pulsateLcdBl();
+#endif
 }
 
 /*main tasks service*/
