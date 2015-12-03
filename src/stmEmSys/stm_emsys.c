@@ -4,6 +4,21 @@ and interrupt handler*/
 #include "stm_emsys.h"
 #include "stm_emsys_lib.h"
 
+void initAllPeripherals()
+{
+	/*init analog*/
+	initAdcPortA();
+	/*init stepper motors*/
+	initStepper();
+	/*init Lcd*/
+	initLcd(LCD_DISP_ON);
+
+	gotoLcd(4);
+	putsLcd("WELCOME!");
+	gotoLcd(65);
+	putsLcd("Init Completed!");
+
+}
 
 /*timer interrupt service*/
 void emSysTimerService()

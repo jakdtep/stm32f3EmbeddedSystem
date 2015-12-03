@@ -52,6 +52,8 @@ int main(int argc, char **argv)
     printf("Failed to initialize Gyroscope\n");
     Error_Handler();
   }
+  
+  initAllPeripherals();
 
   while(1) {
     TaskInput();
