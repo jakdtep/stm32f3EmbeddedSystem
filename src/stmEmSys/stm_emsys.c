@@ -161,3 +161,39 @@ void CmdDcMotor(int mode)
 }
 
 ADD_CMD("dcmotor", CmdDcMotor, "<ON/Off[0/1] +-speed             Command to activate DC motor");
+
+void CmdSerialInit(int mode)
+{
+	if(mode != CMD_INTERACTIVE) return;
+	printf("Serial Init\n");
+
+	if(initSerialPortC() != UART_OK)
+		printf("UART init error\n");
+	else
+		printf("UART init Success\n");
+
+}
+
+ADD_CMD("serinit", CmdSerialInit, "             Command to initialize serial port");
+
+void CmdSerialTX(int mode)
+{
+	char *tempCmdArgStr;
+
+	if(mode != CMD_INTERACTIVE) return;
+	printf("Serial Transmit\n");
+
+	fetch_string_arg((char**)&tempCmdArgStr);
+
+	uint8_t uartTxBuf[UART_BUF_SIZE];
+
+	strncpy((char *)uartTxBuf, tempCmdArgStr, strlen((const char*)tempCmdArgStr));
+
+	if(transmitStrSerialPortC((char *)uartTxBuf) != UART_OK)
+		printf("UART transmit error\n");
+	else
+		printf("Transmission Success!!\n");
+
+}
+
+ADD_CMD("sertx", CmdSerialTX, "         Command to transmit a character serial port");

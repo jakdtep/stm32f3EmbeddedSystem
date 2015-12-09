@@ -8,4 +8,5 @@ on the board*/
 #include "stm_emsys_stepper.h"
 #include "stm_emsys_lcd16x2.h"
 #include "stm_emsys_dc.h"
+#include "stm_emsys_serial.h"
 #endif

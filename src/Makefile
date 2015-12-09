@@ -16,7 +16,8 @@ SRCS += stmEmSys/stm_emsys.c \
         stmEmSys/stm_emsys_analog.c \
         stmEmSys/stm_emsys_stepper.c \
         stmEmSys/stm_emsys_lcd16x2.c \
-	stmEmSys/stm_emsys_dc.c 
+	stmEmSys/stm_emsys_dc.c \
+        stmEmSys/stm_emsys_serial.c	
 
 ###################################################
 # Location of the linker scripts
