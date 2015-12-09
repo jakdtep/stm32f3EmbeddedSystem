@@ -18,22 +18,30 @@ This file implements DC Motor init based on received command
 #define DCMOTOR_TACHO_CH        5
 
 #define DCMOTOR_ADC2SPEED_M             3
-#define DCMOTOR_ADC2SPEED_C             100
-#define DCMOTOR_RESPOND_DELTA           50
+#define DCMOTOR_ADC2SPEED_C             43
+#define DCMOTOR_RESPOND_DELTA           75
 #define DCMOTOR_SPEED_STEP              10
 #define DCMOTOR_MIN_SPEED               300
 #define DCMOTOR_MAX_SPEED               1000
 
 
-// API to start DC Motor
-void startDcMotor( uint32_t cmdArg1, int32_t cmdArg2, uint16_t adc);
+/*API to initialize dc motor*/
+int8_t initDcMotorControl();
 
-// API to stop DC Motor
+// API to start DC Motor
+void startDcMotor(uint32_t cmdArg1, int32_t cmdArg2, uint16_t adc);
+
+/*set dc motor direction gpios on portC*/
+int8_t setDirDcMotorPC(int32_t speed, uint32_t *gpios);
+
+/*set dc motor speed PWM  portB*/
+int8_t setSpeedDcMotorPB(int32_t speed, uint32_t gpio);
+
+/*turn dc motor off  portB*/
 int8_t stopDcMotorPB(uint32_t gpio);
 
 // API to update dcmotor speed in closed loop to be called from timer interrupt
 void updateDcMotorSpeed();
-
 
 #endif
 

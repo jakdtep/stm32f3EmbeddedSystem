@@ -275,7 +275,7 @@ int8_t initDcMotorControl()
 void startDcMotor( uint32_t cmdArg1, int32_t cmdArg2, uint16_t adc)
 {
 
-	/*make sure stepper init is done once*/
+	/*make sure dcmotor init is done once*/
 	if(!dcMotorInitDone)
 	{
 		initDcMotorControl();
