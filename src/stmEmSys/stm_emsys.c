@@ -10,6 +10,10 @@ void initAllPeripherals()
 	initAdcPortA();
 	/*init stepper motors*/
 	initStepper();
+	/*init dc motors*/
+	initDcMotorControl();
+	/*init Uart*/
+	initSerialPortC();
 	/*init Lcd*/
 	initLcd(LCD_DISP_ON);
 
