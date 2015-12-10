@@ -21,4 +21,7 @@ void initAdcPortA();
 /*API to read from specified channel*/
 int16_t readAdcPortA(uint8_t chNo);
 
+/*API to set the DAC output*/
+void writeDacPortA(uint16_t dacVal);
+
 #endif

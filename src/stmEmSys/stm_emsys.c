@@ -69,6 +69,23 @@ void CmdAdcRead(int mode)
 }
 ADD_CMD("adcread", CmdAdcRead, "adcread <ch[1-4]> Command to read ADC after adcinit command");
 
+void CmdDacWrite(int mode)
+{
+	uint32_t dacVal;
+
+	if(mode != CMD_INTERACTIVE) return;
+
+	fetch_uint32_arg(&dacVal);
+
+	if(dacVal > 4095)
+	{
+		printf("argument out of range\n");
+		return;
+	}
+
+	writeDacPortA(dacVal);
+}
+ADD_CMD("dacwrite", CmdDacWrite, "dacwrite val       Command to read ADC after adcinit command");
 
 /*commands for stepper motor*/
 void CmdStepper(int mode)

@@ -14,7 +14,7 @@ void initAdcPortA()
 	/* enable clock for port A */
 	__GPIOA_CLK_ENABLE();
 	/*use 3 gpios in port A*/
-	GPIO_InitStruct.Pin       = GPIO_PIN_1 |GPIO_PIN_2 | GPIO_PIN_3;
+	GPIO_InitStruct.Pin       = GPIO_PIN_1 |GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_4; 
 	/*choose analog mode; additional function*/
 	GPIO_InitStruct.Mode      = GPIO_MODE_ANALOG;
 	GPIO_InitStruct.Pull      = GPIO_NOPULL;
@@ -76,6 +76,12 @@ void initAdcPortA()
 	if(HAL_OK != ret)
 		printf("ADC init for PA0-PA4 failed\n");
 
+	/*enable the DAC module*/
+	__DAC1_CLK_ENABLE();
+	/*no external trigger enabled (direct conversion mode)*/
+	/*buffer enabled*/
+	DAC1->CR = 1;
+	
 }
 
 int16_t readAdcPortA(uint8_t chNo)
@@ -126,3 +132,9 @@ int16_t readAdcPortA(uint8_t chNo)
 
 }
 
+
+void writeDacPortA(uint16_t dacVal)
+{
+	/*send the dac value to HDR register*/
+	DAC->DHR12R1 = dacVal;
+}
