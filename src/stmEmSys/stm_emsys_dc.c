@@ -15,6 +15,11 @@ static int16_t dcMotor2SetSpeed = 0;
 /*to track running status*/
 static int8_t dcMotorIsRunning = 0;
 
+/*link the varibale to timer interrupt*/
+extern volatile uint32_t myTickCount;
+uint32_t dcMotorDelay = 1;
+uint32_t dcMotorTimer = 0;
+
 static ADC_HandleTypeDef handleADC;
 static ADC_ChannelConfTypeDef dcMotorAdcChConfig1;
 
@@ -269,6 +274,12 @@ void updateDcMotorSpeed()
 	/*skip if dcmotor is not running*/
 	if(!dcMotorIsRunning)
 		return;
+	if(!dcMotorTimer)
+	{
+		dcMotorTimer = myTickCount + dcMotorDelay;
+	}else if(myTickCount < dcMotorTimer)   
+	    return;
+	
 	if(dcMotor1SetSpeed)
 	{
 		int16_t tacho1 = 0, calcSpeed = 0, delta = 0;
@@ -295,6 +306,8 @@ void updateDcMotorSpeed()
 		else if(delta < -DCMOTOR_RESPOND_DELTA)
 			setSpeedDcMotorPB(1, dcMotor2CurSpeed - DCMOTOR_SPEED_STEP);
 	}
+	/*restart timer*/
+	dcMotorTimer = myTickCount + dcMotorDelay;
 }
 
 int8_t initDcMotorControl()

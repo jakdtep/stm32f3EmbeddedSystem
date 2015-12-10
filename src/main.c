@@ -61,6 +61,8 @@ int main(int argc, char **argv)
     
     /*embedded system external peripheral service*/
     emSysTaskService();
+    /*embedded system peripheral timer service*/
+    emSysTimerService();
   }
 
   return 0;
@@ -130,9 +132,6 @@ void SysTick_Handler(void)
 {
     HAL_IncTick();
     myTickCount++;
-    
-    /*embedded system peripheral timer service*/
-    emSysTimerService();
 }
 
 void CmdLED(int mode)

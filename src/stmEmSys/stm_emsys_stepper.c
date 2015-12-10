@@ -6,7 +6,7 @@
 #include "stm_emsys_stepper.h"
 
 /*link the varibale to timer interrupt*/
-extern uint32_t myTickCount;
+extern volatile uint32_t myTickCount;
 /*status to track initialization*/
 static int8_t stepperInitDone = 0;
 
