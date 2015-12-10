@@ -24,7 +24,7 @@ void initAllPeripherals()
 void emSysTimerService()
 {
 	triggerStepper();
-	updateDcMotorSpeed(0);
+	updateDcMotorSpeed();
 #ifdef LCD_BL_PULSE_ON
 	pulsateLcdBl();
 #endif
@@ -135,7 +135,6 @@ void CmdDcMotor(int mode)
     uint32_t cmdArgId;
 	uint32_t cmdArg1;
 	int32_t cmdArg2;
-	uint16_t adc = 0;
 
 	if(mode != CMD_INTERACTIVE) return;
 	printf("DC Motor motor\n");
@@ -164,7 +163,7 @@ void CmdDcMotor(int mode)
 		printf("Signed speed argument missing\n");
 		return;
 	}
-	startDcMotor(cmdArgId, cmdArg1, cmdArg2, adc);
+	startDcMotor(cmdArgId, cmdArg1, cmdArg2);
 }
 
 ADD_CMD("dcmotor", CmdDcMotor, "<ON/Off[0/1] +-speed             Command to activate DC motor");

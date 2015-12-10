@@ -30,7 +30,7 @@ This file implements DC Motor init based on received command
 int8_t initDcMotorControl();
 
 // API to start DC Motor
-void startDcMotor(uint8_t motorId, uint32_t cmdArg1, int32_t cmdArg2, uint16_t adc);
+void startDcMotor(uint8_t motorId, uint32_t cmdArg1, int32_t cmdArg2);
 
 /*set dc motor direction gpios on portC*/
 int8_t setDirDcMotorPC(uint8_t motorId, int32_t speed, uint32_t *gpios);
@@ -42,7 +42,7 @@ int8_t setSpeedDcMotorPB(uint8_t motorId, int32_t speed);
 int8_t stopDcMotorPB(uint8_t motorId);
 
 // API to update dcmotor speed in closed loop to be called from timer interrupt
-void updateDcMotorSpeed(uint8_t motorId);
+void updateDcMotorSpeed();
 
 #endif
 

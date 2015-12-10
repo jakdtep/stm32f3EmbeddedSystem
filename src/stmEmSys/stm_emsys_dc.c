@@ -31,11 +31,11 @@ void initPwmTIM1(uint32_t prescale)
 	__TIM15_CLK_ENABLE();
 	TIM15->PSC = prescale;
 	TIM15->ARR = DCMOTOR_MAX_SPEED; 
-	TIM15->CR1 |= (1<<7);
-	TIM15->CCMR1 = 0b0110100001101000;
-	TIM15->EGR |= 0b11100110;
-	TIM15->BDTR |= (1<<15);
 	TIM15->CCER = 0x11;
+	TIM15->CR1 |= (1<<7);
+	TIM15->CCMR1 = 0b0110100001101000;//6868
+	TIM15->EGR |= 0b11100110;//e6
+	TIM15->BDTR |= (1<<15);
 }
 
 
@@ -221,7 +221,6 @@ int8_t setSpeedDcMotorPB(uint8_t motorId, int32_t speed)
 	speed = speed<DCMOTOR_MIN_SPEED?DCMOTOR_MIN_SPEED:speed;
 	speed = speed>DCMOTOR_MAX_SPEED?DCMOTOR_MAX_SPEED:speed;
 
-	TIM15->BDTR |= (1<<15);
 	if(!motorId)
 	{
 		TIM15->CCR1 = speed;
@@ -243,26 +242,38 @@ int8_t stopDcMotorPB(uint8_t motorId)
 {
 	printf("DC motor stop\n");
 
-	//TIM15->BDTR &= ~(1<<15);
-	TIM15->CCR1 = 0;
-	TIM15->CR1 &= ~1;
-	dcMotor1CurSpeed = 0;
+//	TIM15->BDTR &= ~(1<<15);
+	if(!motorId)
+	{
+		TIM15->CCR1 = 1;
+		TIM15->CCR1 = 0;
+		dcMotor1CurSpeed = 0;
+		dcMotor1SetSpeed = 0;
+	}else
+	{	
+		TIM15->CCR2 = 1;
+		TIM15->CCR2 = 0;
+		dcMotor2CurSpeed = 0;
+		dcMotor2SetSpeed = 0;
+	}
+
 	dcMotorIsRunning = 0;
 	return DCMOTOR_OK;
 }
 
 /*funtion to update dcmotor speed in closed loop
   to be called from timer interrupt*/
-void updateDcMotorSpeed(uint8_t motorId)
+void updateDcMotorSpeed()
 {
 
 	/*skip if dcmotor is not running*/
 	if(!dcMotorIsRunning)
 		return;
-	if(!motorId)
+	if(dcMotor1SetSpeed)
 	{
 		int16_t tacho1 = 0, calcSpeed = 0, delta = 0;
 		tacho1 = sampleDcMotorTacho(DCMOTOR_TACHO_CH1);
+		//y = mx+c
 		calcSpeed = (tacho1 + DCMOTOR_ADC2SPEED_C) / DCMOTOR_ADC2SPEED_M;
 		delta = dcMotor1SetSpeed - calcSpeed;
 	//	printf("tacho=%d, calcSpeed=%d, curSpeed=%d, delta=%d\n", tacho1, calcSpeed, dcMotorCurSpeed, delta);
@@ -270,10 +281,12 @@ void updateDcMotorSpeed(uint8_t motorId)
 			setSpeedDcMotorPB(0, dcMotor1CurSpeed + DCMOTOR_SPEED_STEP);
 		else if(delta < -DCMOTOR_RESPOND_DELTA)
 			setSpeedDcMotorPB(0, dcMotor1CurSpeed - DCMOTOR_SPEED_STEP);
-	}else
+	}
+	if(dcMotor2SetSpeed)
 	{
 		int16_t tacho2 = 0, calcSpeed = 0, delta = 0;
 		tacho2 = sampleDcMotorTacho(DCMOTOR_TACHO_CH2);
+		//y = mx+c
 		calcSpeed = (tacho2 + DCMOTOR_ADC2SPEED_C) / DCMOTOR_ADC2SPEED_M;
 		delta = dcMotor2SetSpeed - calcSpeed;
 	//	printf("tacho=%d, calcSpeed=%d, curSpeed=%d, delta=%d\n", tacho1, calcSpeed, dcMotorCurSpeed, delta);
@@ -294,8 +307,9 @@ int8_t initDcMotorControl()
 	return  DCMOTOR_OK;
 }
 
-void startDcMotor(uint8_t motorId,  uint32_t cmdArg1, int32_t cmdArg2, uint16_t adc)
+void startDcMotor(uint8_t motorId,  uint32_t cmdArg1, int32_t cmdArg2)
 {
+	uint16_t adc1, adc2;
 
 	/*make sure dcmotor init is done once*/
 	if(!dcMotorInitDone)
@@ -304,6 +318,7 @@ void startDcMotor(uint8_t motorId,  uint32_t cmdArg1, int32_t cmdArg2, uint16_t 
 		dcMotorInitDone = 1;
 		printf("DC motor control init done!\n");
 	}
+	printf("Controlling Dc motor %d\n", motorId);
 	/*set direction DC motor*/
 	if(setDirDcMotorPC(motorId, cmdArg2, gpiosDcMotorDirPC) != DCMOTOR_OK)
 		printf("set dir error\n");
@@ -314,14 +329,15 @@ void startDcMotor(uint8_t motorId,  uint32_t cmdArg1, int32_t cmdArg2, uint16_t 
 		dcMotor1SetSpeed = cmdArg2<0?-cmdArg2:cmdArg2;
 	else
 		dcMotor2SetSpeed = cmdArg2<0?-cmdArg2:cmdArg2;
-	if(setSpeedDcMotorPB(0, cmdArg2) != DCMOTOR_OK)
+	if(setSpeedDcMotorPB(motorId, cmdArg2) != DCMOTOR_OK)
 		printf("set speed error\n");
 	else
 		printf("Set speed Success!!\n");
 
-	adc = sampleDcMotorTacho(DCMOTOR_TACHO_CH1);
-	adc = sampleDcMotorTacho(DCMOTOR_TACHO_CH2);
-	printf("Tacho %d\n", (unsigned)adc);
+	adc1 = sampleDcMotorTacho(DCMOTOR_TACHO_CH1);
+	adc2 = sampleDcMotorTacho(DCMOTOR_TACHO_CH2);
+	printf("Tacho1 %d\n", (unsigned)adc1);
+	printf("Tacho2 %d\n", (unsigned)adc2);
 
 	//printf("calculated speed=%d\n", (int)((adc + DCMOTOR_ADC2SPEED_C) / DCMOTOR_ADC2SPEED_M));
 }
