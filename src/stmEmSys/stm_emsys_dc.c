@@ -24,7 +24,7 @@ static ADC_HandleTypeDef handleADC;
 static ADC_ChannelConfTypeDef dcMotorAdcChConfig1;
 
 /*gpio pins used for dc motor direction control*/
-static uint32_t gpiosDcMotorDirPC[4] = {GPIO_PIN_0, GPIO_PIN_1, GPIO_PIN_2, GPIO_PIN_3}; 
+static uint32_t gpiosDcMotorDirPC[4] = {GPIO_PIN_0, GPIO_PIN_1, GPIO_PIN_3, GPIO_PIN_2}; 
 /*gpio pins used for dc motor tachometer*/
 static uint32_t gpiosDcMotorTachoPB[2] = {GPIO_PIN_0, GPIO_PIN_13}; 
 /*gpio pins for pwm speed control*/
