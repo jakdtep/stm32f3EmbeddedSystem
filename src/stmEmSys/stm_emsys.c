@@ -29,6 +29,7 @@ void emSysTimerService()
 {
 	triggerStepper();
 	updateDcMotorSpeed();
+	trigWaveDacPortA();
 #ifdef LCD_BL_PULSE_ON
 	pulsateLcdBl();
 #endif
@@ -224,3 +225,32 @@ void CmdSerialTX(int mode)
 }
 
 ADD_CMD("sertx", CmdSerialTX, "         Command to transmit a character serial port");
+
+void CmdTestAll(int mode)
+{
+	char *tempCmdArgStr;
+
+	if(mode != CMD_INTERACTIVE) return;
+	printf("Testing all\n");
+
+	fetch_string_arg((char**)&tempCmdArgStr);
+	
+	clearLcd();
+	putsLcd("Testing All");
+	
+	activateStepper(0, -1000, 100);
+	activateStepper(1, 1000, 500);
+	
+	startDcMotor(0, 1, -500);
+	startDcMotor(1, 1, 600);
+	
+	printf("ADC PA0 = %u\n", (unsigned)readAdcPortA(2));
+	printf("ADC PA1 = %u\n", (unsigned)readAdcPortA(3));
+	printf("ADC PA2 = %u\n", (unsigned)readAdcPortA(4));
+	printf("ADC PF4 = %u\n", (unsigned)readAdcPortA(5));
+	
+}
+
+ADD_CMD("testall", CmdTestAll, "[ON-OFF]         Command to test all peripherals");
+
+

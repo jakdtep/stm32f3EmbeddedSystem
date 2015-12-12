@@ -7,6 +7,12 @@
 
 static ADC_HandleTypeDef handleADC;
 
+/*dac waveform table*/
+extern volatile uint32_t myTickCount;
+static uint16_t trigWaveTb[] = {0, 512, 1024, 2048, 4095, 2048, 1024, 512};
+static uint32_t trigWaveStep = 0; 
+static uint32_t trigWaveDelay = 0;
+
 void initAdcPortA()
 {
 	HAL_StatusTypeDef ret;
@@ -137,4 +143,18 @@ void writeDacPortA(uint16_t dacVal)
 {
 	/*send the dac value to HDR register*/
 	DAC->DHR12R1 = dacVal;
+}
+
+void trigWaveDacPortA()
+{
+    if(!trigWaveDelay)
+    {
+	    trigWaveDelay = myTickCount + DAC_TRIG_WAVE_T;
+	    trigWaveStep = 0;
+    }else if(myTickCount > trigWaveDelay)
+    {
+	    writeDacPortA(trigWaveTb[trigWaveStep++ & (DAC_TRIG_WAVE_STEPS-1)]);
+	    trigWaveDelay = myTickCount + DAC_TRIG_WAVE_T;
+	    //printf("%d\n", (int)lcdPulseStep & (LCD_BL_PULSE_STEPS-1));
+    }
 }

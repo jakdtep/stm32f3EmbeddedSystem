@@ -15,6 +15,9 @@
 #define ADC_OK		0
 #define ADC_ERR		-1
 
+#define DAC_TRIG_WAVE_T     25
+#define DAC_TRIG_WAVE_STEPS 8 
+
 /*API to initialize ADC*/
 void initAdcPortA();
 
@@ -23,5 +26,8 @@ int16_t readAdcPortA(uint8_t chNo);
 
 /*API to set the DAC output*/
 void writeDacPortA(uint16_t dacVal);
+
+/*API to generate triag wave*/
+void trigWaveDacPortA();
 
 #endif
